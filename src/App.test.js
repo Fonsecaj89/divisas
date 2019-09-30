@@ -1,25 +1,59 @@
 /* eslint-disable no-undef */
 import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
+import { Provider } from 'react-redux';
 
-import DivisasForm from './Components/DivisasForm'
+import Adapter from 'enzyme-adapter-react-16';
+import configureMockStore from 'redux-mock-store';
+import { configure, mount } from 'enzyme';
 
-it('renders without crashing', () => {
-  const div = document.createElement('div');
-  ReactDOM.render(<App />, div);
-  ReactDOM.unmountComponentAtNode(div);
+import DivisasForm from './Components/DivisasForm';
+
+configure({ adapter: new Adapter() });
+const mockStore = configureMockStore();
+
+const store = mockStore({
+    cambio: { cambio: 56.9 },
+    USD: 23.5,
+    authorized: false,
 });
 
-/*
-it('check the onChange callback', () => {  
-  const onChange = jest.fn(),
-      props = {
-          USD: '25.40',
-          onChange
-      },
-      DivisasFormComponent = mount(<DivisasForm {...props} />).find('input');
-      DivisasFormComponent.simulate('change', { target: {value: '28.83'} });
-  expect(onChange).toHaveBeenCalledWith('28.83');
+describe('<DivisasForm />', () => {
+    it('render correctly component', () => {
+        const divisasform = mount(
+            <Provider store={store}>
+                <DivisasForm />
+            </Provider>
+        );
+        expect(divisasform).toMatchSnapshot();
+    });
+    it('Chek number of imputs', () => {
+        const divisasform = mount(
+            <Provider store={store}>
+                <DivisasForm />
+            </Provider>
+        );
+        expect(divisasform.find('Input').length).toEqual(2);
+    });
+
+    it('Set State test', () => {
+        const divisasform = mount(
+            <Provider store={store}>
+                <DivisasForm />
+            </Provider>
+        );
+        const input = divisasform.find('Input[name="USD"]').setState({ USD: '24.8' });
+        expect(input.state()).toEqual({ USD: '24.8' });
+    });
 });
-*/
+describe('Redux Actions', () => {
+    it('Check Redux action', () => {
+        // Dispatch the action
+        const logout = () => ({ type: 'LOGOUT' });
+        store.dispatch(logout());
+
+        // Test if your store dispatched the expected actions
+        const actions = store.getActions();
+        const expectedPayload = { type: 'LOGOUT' };
+        expect(actions).toEqual([expectedPayload]);
+    });
+});
