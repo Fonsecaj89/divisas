@@ -11,16 +11,10 @@ class DivisasForm extends Component {
         this.state = {  
             USD: '0.00',
             EUR: 0.00,
-            isEditing: false
         }
         this.onChange = this.onChange.bind(this)
         this.onSubmit = this.onSubmit.bind(this)
     };
-
-    componentDidUpdate(nextProps) {
-        console.log(nextProps, this.state);
-        
-    }
 
     onChange = (event) => {
         this.setState({ [event.target.name]: event.target.value}) 
@@ -65,7 +59,6 @@ class DivisasForm extends Component {
                             name="USD" 
                             value={this.state.USD} 
                             onChange={ this.onChange } 
-                            onBlur={ this.toggleEditing }
                             placeholder='0.00' />
                         </Form.Field>
                         

@@ -1,7 +1,7 @@
 import { LOGIN } from '../actions/types'
 
 const initialState = {
-    login: {} 
+    login: false
 }
 
 export default function(state = initialState, action) {
