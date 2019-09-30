@@ -8,74 +8,65 @@
  *
  */
 
-;(function ($, window, document, undefined) {
+(function($, window, document, undefined) {
+    'use strict';
 
-'use strict';
+    window =
+        typeof window != 'undefined' && window.Math == Math
+            ? window
+            : typeof self != 'undefined' && self.Math == Math
+            ? self
+            : Function('return this')();
 
-window = (typeof window != 'undefined' && window.Math == Math)
-  ? window
-  : (typeof self != 'undefined' && self.Math == Math)
-    ? self
-    : Function('return this')()
-;
+    $.fn.tab = function(parameters) {
+        var // use window context if none specified
+            $allModules = $.isFunction(this) ? $(window) : $(this);
 
-$.fn.tab = function(parameters) {
+    var moduleSelector  = $allModules.selector || '';
+    var time            = new Date().getTime();
+    var performance     = [];
 
-  var
-    // use window context if none specified
-    $allModules     = $.isFunction(this)
-        ? $(window)
-        : $(this),
+    var query           = arguments[0];
+    var methodInvoked   = (typeof query == 'string');
+    var queryArguments  = [].slice.call(arguments, 1);
 
-    moduleSelector  = $allModules.selector || '',
-    time            = new Date().getTime(),
-    performance     = [],
-
-    query           = arguments[0],
-    methodInvoked   = (typeof query == 'string'),
-    queryArguments  = [].slice.call(arguments, 1),
-
-    initializedHistory = false,
-    returnedValue
+    var initializedHistory = false;
+    var returnedValue
   ;
 
-  $allModules
-    .each(function() {
-      var
+        $allModules.each(function() {
+      let
 
         settings        = ( $.isPlainObject(parameters) )
-          ? $.extend(true, {}, $.fn.tab.settings, parameters)
-          : $.extend({}, $.fn.tab.settings),
+                    ? $.extend(true, {}, $.fn.tab.settings, parameters)
+                    : $.extend({}, $.fn.tab.settings);
 
-        className       = settings.className,
-        metadata        = settings.metadata,
-        selector        = settings.selector,
-        error           = settings.error,
+        var className       = settings.className;
+        var metadata        = settings.metadata;
+        var selector        = settings.selector;
+        var error           = settings.error;
 
-        eventNamespace  = '.' + settings.namespace,
-        moduleNamespace = 'module-' + settings.namespace,
+        var eventNamespace  = '.' + settings.namespace;
+        var moduleNamespace = 'module-' + settings.namespace;
 
-        $module         = $(this),
-        $context,
-        $tabs,
+        var $module         = $(this);
+        var $context;
+        var $tabs;
 
-        cache           = {},
-        firstLoad       = true,
-        recursionDepth  = 0,
-        element         = this,
-        instance        = $module.data(moduleNamespace),
+        var cache           = {};
+        var firstLoad       = true;
+        var recursionDepth  = 0;
+        var element         = this;
+        var instance        = $module.data(moduleNamespace);
 
-        activeTabPath,
-        parameterArray,
-        module,
+        var activeTabPath;
+        var parameterArray;
+        var module;
 
-        historyEvent
+        var historyEvent
 
-      ;
-
-      module = {
-
-        initialize: function() {
+            module = {
+                initialize() {
           module.debug('Initializing tab menu item', $module);
           module.fix.callbacks();
           module.determineTabs();
@@ -95,35 +86,28 @@ $.fn.tab = function(parameters) {
           module.instantiate();
         },
 
-        instantiate: function () {
-          module.verbose('Storing instance of module', module);
-          instance = module;
-          $module
-            .data(moduleNamespace, module)
-          ;
-        },
+                instantiate: function() {
+                    module.verbose('Storing instance of module', module);
+                    instance = module;
+                    $module.data(moduleNamespace, module);
+                },
 
-        destroy: function() {
-          module.debug('Destroying tabs', $module);
-          $module
-            .removeData(moduleNamespace)
-            .off(eventNamespace)
-          ;
-        },
+                destroy: function() {
+                    module.debug('Destroying tabs', $module);
+                    $module.removeData(moduleNamespace).off(eventNamespace);
+                },
 
-        bind: {
-          events: function() {
-            // if using $.tab don't add events
-            if( !$.isWindow( element ) ) {
-              module.debug('Attaching tab activation events to element', $module);
-              $module
-                .on('click' + eventNamespace, module.event.click)
-              ;
-            }
-          }
-        },
+                bind: {
+                    events: function() {
+                        // if using $.tab don't add events
+                        if (!$.isWindow(element)) {
+                            module.debug('Attaching tab activation events to element', $module);
+                            $module.on('click' + eventNamespace, module.event.click);
+                        }
+                    },
+                },
 
-        determineTabs: function() {
+                determineTabs() {
           var
             $reference
           ;
@@ -158,8 +142,8 @@ $.fn.tab = function(parameters) {
           }
         },
 
-        fix: {
-          callbacks: function() {
+                fix: {
+                    callbacks() {
             if( $.isPlainObject(parameters) && (parameters.onTabLoad || parameters.onTabInit) ) {
               if(parameters.onTabLoad) {
                 parameters.onLoad = parameters.onTabLoad;
@@ -174,9 +158,9 @@ $.fn.tab = function(parameters) {
               settings = $.extend(true, {}, $.fn.tab.settings, parameters);
             }
           }
-        },
+                },
 
-        initializeHistory: function() {
+                initializeHistory() {
           module.debug('Initializing page state');
           if( $.address === undefined ) {
             module.error(error.state);
@@ -202,8 +186,8 @@ $.fn.tab = function(parameters) {
           }
         },
 
-        event: {
-          click: function(event) {
+                event: {
+                    click(event) {
             var
               tabPath = $(this).data(metadata.tab)
             ;
@@ -222,8 +206,8 @@ $.fn.tab = function(parameters) {
               module.debug('No tab specified');
             }
           },
-          history: {
-            change: function(event) {
+                    history: {
+                        change(event) {
               var
                 tabPath   = event.pathNames.join('/') || module.get.initialPath(),
                 pageTitle = settings.templates.determineTitle(tabPath) || false
@@ -238,38 +222,37 @@ $.fn.tab = function(parameters) {
                 $.address.title(pageTitle);
               }
             }
-          }
-        },
+                    },
+                },
 
-        refresh: function() {
+                refresh() {
           if(activeTabPath) {
             module.debug('Refreshing tab', activeTabPath);
             module.changeTab(activeTabPath);
           }
         },
 
-        cache: {
-
-          read: function(cacheKey) {
+                cache: {
+                    read(cacheKey) {
             return (cacheKey !== undefined)
               ? cache[cacheKey]
               : false
             ;
           },
-          add: function(cacheKey, content) {
+          add(cacheKey, content) {
             cacheKey = cacheKey || activeTabPath;
             module.debug('Adding cached content for', cacheKey);
             cache[cacheKey] = content;
           },
-          remove: function(cacheKey) {
-            cacheKey = cacheKey || activeTabPath;
-            module.debug('Removing cached content for', cacheKey);
-            delete cache[cacheKey];
-          }
-        },
+                    remove: function(cacheKey) {
+                        cacheKey = cacheKey || activeTabPath;
+                        module.debug('Removing cached content for', cacheKey);
+                        delete cache[cacheKey];
+                    },
+                },
 
-        set: {
-          auto: function() {
+                set: {
+                    auto() {
             var
               url = (typeof settings.path == 'string')
                 ? settings.path.replace(/\/$/, '') + '/{$tab}'
@@ -285,40 +268,36 @@ $.fn.tab = function(parameters) {
               };
             }
           },
-          loading: function(tabPath) {
-            var
-              $tab      = module.get.tabElement(tabPath),
-              isLoading = $tab.hasClass(className.loading)
-            ;
-            if(!isLoading) {
-              module.verbose('Setting loading state for', $tab);
-              $tab
-                .addClass(className.loading)
-                .siblings($tabs)
-                  .removeClass(className.active + ' ' + className.loading)
-              ;
-              if($tab.length > 0) {
-                settings.onRequest.call($tab[0], tabPath);
-              }
-            }
-          },
-          state: function(state) {
+                    loading: function(tabPath) {
+            let
+              $tab      = module.get.tabElement(tabPath);
+              var isLoading = $tab.hasClass(className.loading)
+                        if (!isLoading) {
+                            module.verbose('Setting loading state for', $tab);
+                            $tab.addClass(className.loading)
+                                .siblings($tabs)
+                                .removeClass(className.active + ' ' + className.loading);
+                            if ($tab.length > 0) {
+                                settings.onRequest.call($tab[0], tabPath);
+                            }
+                        }
+                    },
+                    state(state) {
             $.address.value(state);
           }
-        },
+                },
 
-        changeTab: function(tabPath) {
-          var
-            pushStateAvailable = (window.history && window.history.pushState),
-            shouldIgnoreLoad   = (pushStateAvailable && settings.ignoreFirstLoad && firstLoad),
-            remoteContent      = (settings.auto || $.isPlainObject(settings.apiSettings) ),
+                changeTab: function(tabPath) {
+          let
+            pushStateAvailable = (window.history && window.history.pushState);
+            var shouldIgnoreLoad   = (pushStateAvailable && settings.ignoreFirstLoad && firstLoad);
+            var remoteContent      = (settings.auto || $.isPlainObject(settings.apiSettings) );
             // only add default path if not remote content
-            pathArray = (remoteContent && !shouldIgnoreLoad)
-              ? module.utilities.pathToArray(tabPath)
-              : module.get.defaultPathArray(tabPath)
-          ;
-          tabPath = module.utilities.arrayToPath(pathArray);
-          $.each(pathArray, function(index, tab) {
+            var pathArray = (remoteContent && !shouldIgnoreLoad)
+                                ? module.utilities.pathToArray(tabPath)
+                                : module.get.defaultPathArray(tabPath);
+                    tabPath = module.utilities.arrayToPath(pathArray);
+                    $.each(pathArray, function(index, tab) {
             var
               currentPathArray   = pathArray.slice(0, index + 1),
               currentPath        = module.utilities.arrayToPath(currentPathArray),
@@ -365,7 +344,7 @@ $.fn.tab = function(parameters) {
                 }
                 return false;
               }
-              else {
+              
                 module.debug('Opened local tab', currentPath);
                 module.activate.all(currentPath);
                 if( !module.cache.read(currentPath) ) {
@@ -374,7 +353,7 @@ $.fn.tab = function(parameters) {
                   settings.onFirstLoad.call($tab[0], currentPath, parameterArray, historyEvent);
                 }
                 settings.onLoad.call($tab[0], currentPath, parameterArray, historyEvent);
-              }
+              
 
             }
             else if(tabPath.search('/') == -1 && tabPath !== '') {
@@ -405,22 +384,25 @@ $.fn.tab = function(parameters) {
               return false;
             }
           });
-        },
+                },
 
-        scrollTo: function($element) {
-          var
+                scrollTo: function($element) {
+          let
             scrollOffset = ($element && $element.length > 0)
               ? $element.offset().top
               : false
-          ;
-          if(scrollOffset !== false) {
-            module.debug('Forcing scroll to an in-page link in a hidden tab', scrollOffset, $element);
-            $(document).scrollTop(scrollOffset);
-          }
-        },
+                    if (scrollOffset !== false) {
+                        module.debug(
+                            'Forcing scroll to an in-page link in a hidden tab',
+                            scrollOffset,
+                            $element
+                        );
+                        $(document).scrollTop(scrollOffset);
+                    }
+                },
 
-        update: {
-          content: function(tabPath, html, evaluateScripts) {
+                update: {
+                    content(tabPath, html, evaluateScripts) {
             var
               $tab = module.get.tabElement(tabPath),
               tab  = $tab[0]
@@ -446,11 +428,10 @@ $.fn.tab = function(parameters) {
               }
             }
           }
-        },
+                },
 
-        fetch: {
-
-          content: function(tabPath, fullTabPath) {
+                fetch: {
+                    content(tabPath, fullTabPath) {
             var
               $tab        = module.get.tabElement(tabPath),
               apiSettings = {
@@ -533,14 +514,14 @@ $.fn.tab = function(parameters) {
               module.error(error.api);
             }
           }
-        },
+                },
 
-        activate: {
-          all: function(tabPath) {
+                activate: {
+                    all(tabPath) {
             module.activate.tab(tabPath);
             module.activate.navigation(tabPath);
           },
-          tab: function(tabPath) {
+                    tab(tabPath) {
             var
               $tab          = module.get.tabElement(tabPath),
               $deactiveTabs = (settings.deactivate == 'siblings')
@@ -561,64 +542,61 @@ $.fn.tab = function(parameters) {
               }
             }
           },
-          navigation: function(tabPath) {
-            var
-              $navigation         = module.get.navElement(tabPath),
-              $deactiveNavigation = (settings.deactivate == 'siblings')
+                    navigation: function(tabPath) {
+            let
+              $navigation         = module.get.navElement(tabPath);
+              var $deactiveNavigation = (settings.deactivate == 'siblings')
                 ? $navigation.siblings($allModules)
-                : $allModules.not($navigation),
-              isActive    = $navigation.hasClass(className.active)
-            ;
-            module.verbose('Activating tab navigation for', $navigation, tabPath);
-            if(!isActive) {
-              $navigation
-                .addClass(className.active)
-              ;
-              $deactiveNavigation
-                .removeClass(className.active + ' ' + className.loading)
-              ;
-            }
-          }
-        },
+                : $allModules.not($navigation);
+              var isActive    = $navigation.hasClass(className.active)
+                        module.verbose('Activating tab navigation for', $navigation, tabPath);
+                        if (!isActive) {
+                            $navigation.addClass(className.active);
+                            $deactiveNavigation.removeClass(
+                                className.active + ' ' + className.loading
+                            );
+                        }
+                    },
+                },
 
-        deactivate: {
-          all: function() {
+                deactivate: {
+                    all() {
             module.deactivate.navigation();
             module.deactivate.tabs();
           },
-          navigation: function() {
-            $allModules
-              .removeClass(className.active)
-            ;
-          },
-          tabs: function() {
+                    navigation: function() {
+                        $allModules.removeClass(className.active);
+                    },
+                    tabs() {
             $tabs
               .removeClass(className.active + ' ' + className.loading)
             ;
           }
         },
 
-        is: {
-          tab: function(tabName) {
+                is: {
+                    tab(tabName) {
             return (tabName !== undefined)
               ? ( module.get.tabElement(tabName).length > 0 )
               : false
             ;
           }
-        },
+                },
 
-        get: {
-          initialPath: function() {
-            return $allModules.eq(0).data(metadata.tab) || $tabs.eq(0).data(metadata.tab);
-          },
-          path: function() {
-            return $.address.value();
-          },
-          // adds default tabs to tab path
-          defaultPathArray: function(tabPath) {
-            return module.utilities.pathToArray( module.get.defaultPath(tabPath) );
-          },
-          defaultPath: function(tabPath) {
+                get: {
+                    initialPath: function() {
+                        return (
+                            $allModules.eq(0).data(metadata.tab) || $tabs.eq(0).data(metadata.tab)
+                        );
+                    },
+                    path: function() {
+                        return $.address.value();
+                    },
+                    // adds default tabs to tab path
+                    defaultPathArray: function(tabPath) {
+                        return module.utilities.pathToArray(module.get.defaultPath(tabPath));
+                    },
+                    defaultPath(tabPath) {
             var
               $defaultNav = $allModules.filter('[data-' + metadata.tab + '^="' + tabPath + '/"]').eq(0),
               defaultTab  = $defaultNav.data(metadata.tab) || false
@@ -637,11 +615,11 @@ $.fn.tab = function(parameters) {
             recursionDepth = 0;
             return tabPath;
           },
-          navElement: function(tabPath) {
+                    navElement(tabPath) {
             tabPath = tabPath || activeTabPath;
             return $allModules.filter('[data-' + metadata.tab + '="' + tabPath + '"]');
           },
-          tabElement: function(tabPath) {
+                    tabElement(tabPath) {
             var
               $fullPathTab,
               $simplePathTab,
@@ -658,24 +636,24 @@ $.fn.tab = function(parameters) {
               : $simplePathTab
             ;
           },
-          tab: function() {
-            return activeTabPath;
-          }
-        },
+                    tab: function() {
+                        return activeTabPath;
+                    },
+                },
 
-        utilities: {
-          filterArray: function(keepArray, removeArray) {
-            return $.grep(keepArray, function(keepValue) {
-              return ( $.inArray(keepValue, removeArray) == -1);
-            });
-          },
-          last: function(array) {
+                utilities: {
+                    filterArray: function(keepArray, removeArray) {
+                        return $.grep(keepArray, function(keepValue) {
+                            return $.inArray(keepValue, removeArray) == -1;
+                        });
+                    },
+                    last(array) {
             return $.isArray(array)
               ? array[ array.length - 1]
               : false
             ;
           },
-          pathToArray: function(pathName) {
+          pathToArray(pathName) {
             if(pathName === undefined) {
               pathName = activeTabPath;
             }
@@ -684,15 +662,13 @@ $.fn.tab = function(parameters) {
               : [pathName]
             ;
           },
-          arrayToPath: function(pathArray) {
+          arrayToPath(pathArray) {
             return $.isArray(pathArray)
               ? pathArray.join('/')
               : false
             ;
           }
-        },
-
-        setting: function(name, value) {
+                setting(name, value) {
           module.debug('Changing setting', name, value);
           if( $.isPlainObject(name) ) {
             $.extend(true, settings, name);
@@ -709,7 +685,7 @@ $.fn.tab = function(parameters) {
             return settings[name];
           }
         },
-        internal: function(name, value) {
+                internal(name, value) {
           if( $.isPlainObject(name) ) {
             $.extend(true, module, name);
           }
@@ -720,7 +696,7 @@ $.fn.tab = function(parameters) {
             return module[name];
           }
         },
-        debug: function() {
+                debug() {
           if(!settings.silent && settings.debug) {
             if(settings.performance) {
               module.performance.log(arguments);
@@ -731,7 +707,7 @@ $.fn.tab = function(parameters) {
             }
           }
         },
-        verbose: function() {
+                verbose() {
           if(!settings.silent && settings.verbose && settings.debug) {
             if(settings.performance) {
               module.performance.log(arguments);
@@ -742,35 +718,34 @@ $.fn.tab = function(parameters) {
             }
           }
         },
-        error: function() {
+                error() {
           if(!settings.silent) {
             module.error = Function.prototype.bind.call(console.error, console, settings.name + ':');
             module.error.apply(console, arguments);
           }
         },
-        performance: {
-          log: function(message) {
-            var
-              currentTime,
-              executionTime,
-              previousTime
-            ;
-            if(settings.performance) {
-              currentTime   = new Date().getTime();
-              previousTime  = time || currentTime;
-              executionTime = currentTime - previousTime;
-              time          = currentTime;
-              performance.push({
-                'Name'           : message[0],
-                'Arguments'      : [].slice.call(message, 1) || '',
-                'Element'        : element,
-                'Execution Time' : executionTime
-              });
-            }
-            clearTimeout(module.performance.timer);
-            module.performance.timer = setTimeout(module.performance.display, 500);
-          },
-          display: function() {
+                performance: {
+                    log: function(message) {
+            let
+              currentTime;
+              var executionTime;
+              var previousTime
+                        if (settings.performance) {
+                            currentTime = new Date().getTime();
+                            previousTime = time || currentTime;
+                            executionTime = currentTime - previousTime;
+                            time = currentTime;
+                            performance.push({
+                                Name: message[0],
+                                Arguments: [].slice.call(message, 1) || '',
+                                Element: element,
+                                'Execution Time': executionTime,
+                            });
+                        }
+                        clearTimeout(module.performance.timer);
+                        module.performance.timer = setTimeout(module.performance.display, 500);
+                    },
+                    display() {
             var
               title = settings.name + ':',
               totalTime = 0
@@ -798,8 +773,8 @@ $.fn.tab = function(parameters) {
             }
             performance = [];
           }
-        },
-        invoke: function(query, passedArguments, context) {
+                },
+                invoke(query, passedArguments, context) {
           var
             object = instance,
             maxDepth,
@@ -853,100 +828,93 @@ $.fn.tab = function(parameters) {
           }
           return found;
         }
-      };
-      if(methodInvoked) {
-        if(instance === undefined) {
-          module.initialize();
-        }
-        module.invoke(query);
-      }
-      else {
-        if(instance !== undefined) {
-          instance.invoke('destroy');
-        }
-        module.initialize();
-      }
-    })
-  ;
-  return (returnedValue !== undefined)
-    ? returnedValue
-    : this
-  ;
+            };
+            if (methodInvoked) {
+                if (instance === undefined) {
+                    module.initialize();
+                }
+                module.invoke(query);
+            } else {
+                if (instance !== undefined) {
+                    instance.invoke('destroy');
+                }
+                module.initialize();
+            }
+        });
+        return returnedValue !== undefined ? returnedValue : this;
+    };
 
-};
+    // shortcut for tabbed content with no defined navigation
+    $.tab = function() {
+        $(window).tab.apply(this, arguments);
+    };
 
-// shortcut for tabbed content with no defined navigation
-$.tab = function() {
-  $(window).tab.apply(this, arguments);
-};
+    $.fn.tab.settings = {
+        name: 'Tab',
+        namespace: 'tab',
 
-$.fn.tab.settings = {
+        silent: false,
+        debug: false,
+        verbose: false,
+        performance: true,
 
-  name            : 'Tab',
-  namespace       : 'tab',
+        auto: false, // uses pjax style endpoints fetching content from same url with remote-content headers
+        history: false, // use browser history
+        historyType: 'hash', // #/ or html5 state
+        path: false, // base path of url
 
-  silent          : false,
-  debug           : false,
-  verbose         : false,
-  performance     : true,
+        context: false, // specify a context that tabs must appear inside
+        childrenOnly: false, // use only tabs that are children of context
+        maxDepth: 25, // max depth a tab can be nested
 
-  auto            : false,      // uses pjax style endpoints fetching content from same url with remote-content headers
-  history         : false,      // use browser history
-  historyType     : 'hash',     // #/ or html5 state
-  path            : false,      // base path of url
+        deactivate: 'siblings', // whether tabs should deactivate sibling menu elements or all elements initialized together
 
-  context         : false,      // specify a context that tabs must appear inside
-  childrenOnly    : false,      // use only tabs that are children of context
-  maxDepth        : 25,         // max depth a tab can be nested
+        alwaysRefresh: false, // load tab content new every tab click
+        cache: true, // cache the content requests to pull locally
+        loadOnce: false, // Whether tab data should only be loaded once when using remote content
+        cacheType: 'response', // Whether to cache exact response, or to html cache contents after scripts execute
+        ignoreFirstLoad: false, // don't load remote content on first load
 
-  deactivate      : 'siblings', // whether tabs should deactivate sibling menu elements or all elements initialized together
+        apiSettings: false, // settings for api call
+        evaluateScripts: 'once', // whether inline scripts should be parsed (true/false/once). Once will not re-evaluate on cached content
 
-  alwaysRefresh   : false,      // load tab content new every tab click
-  cache           : true,       // cache the content requests to pull locally
-  loadOnce        : false,      // Whether tab data should only be loaded once when using remote content
-  cacheType       : 'response', // Whether to cache exact response, or to html cache contents after scripts execute
-  ignoreFirstLoad : false,      // don't load remote content on first load
+        onFirstLoad: function(tabPath, parameterArray, historyEvent) {}, // called first time loaded
+        onLoad: function(tabPath, parameterArray, historyEvent) {}, // called on every load
+        onVisible: function(tabPath, parameterArray, historyEvent) {}, // called every time tab visible
+        onRequest: function(tabPath, parameterArray, historyEvent) {}, // called ever time a tab beings loading remote content
 
-  apiSettings     : false,      // settings for api call
-  evaluateScripts : 'once',     // whether inline scripts should be parsed (true/false/once). Once will not re-evaluate on cached content
+        templates: {
+    determineTitle(tabArray) {} // returns page title for path
+        },
 
-  onFirstLoad : function(tabPath, parameterArray, historyEvent) {}, // called first time loaded
-  onLoad      : function(tabPath, parameterArray, historyEvent) {}, // called on every load
-  onVisible   : function(tabPath, parameterArray, historyEvent) {}, // called every time tab visible
-  onRequest   : function(tabPath, parameterArray, historyEvent) {}, // called ever time a tab beings loading remote content
+        error: {
+            api: 'You attempted to load content without API module',
+            method: 'The method you called is not defined',
+            missingTab: 'Activated tab cannot be found. Tabs are case-sensitive.',
+            noContent: 'The tab you specified is missing a content url.',
+            path: 'History enabled, but no path was specified',
+            recursion: 'Max recursive depth reached',
+            legacyInit:
+                'onTabInit has been renamed to onFirstLoad in 2.0, please adjust your code.',
+            legacyLoad: 'onTabLoad has been renamed to onLoad in 2.0. Please adjust your code',
+            state:
+                "History requires Asual's Address library <https://github.com/asual/jquery-address>",
+        },
 
-  templates : {
-    determineTitle: function(tabArray) {} // returns page title for path
-  },
+        metadata: {
+            tab: 'tab',
+            loaded: 'loaded',
+            promise: 'promise',
+        },
 
-  error: {
-    api        : 'You attempted to load content without API module',
-    method     : 'The method you called is not defined',
-    missingTab : 'Activated tab cannot be found. Tabs are case-sensitive.',
-    noContent  : 'The tab you specified is missing a content url.',
-    path       : 'History enabled, but no path was specified',
-    recursion  : 'Max recursive depth reached',
-    legacyInit : 'onTabInit has been renamed to onFirstLoad in 2.0, please adjust your code.',
-    legacyLoad : 'onTabLoad has been renamed to onLoad in 2.0. Please adjust your code',
-    state      : 'History requires Asual\'s Address library <https://github.com/asual/jquery-address>'
-  },
+        className: {
+            loading: 'loading',
+            active: 'active',
+        },
 
-  metadata : {
-    tab    : 'tab',
-    loaded : 'loaded',
-    promise: 'promise'
-  },
-
-  className   : {
-    loading : 'loading',
-    active  : 'active'
-  },
-
-  selector    : {
-    tabs : '.ui.tab',
-    ui   : '.ui'
-  }
-
-};
-
-})( jQuery, window, document );
+        selector: {
+            tabs: '.ui.tab',
+            ui: '.ui',
+        },
+    };
+})(jQuery, window, document);
