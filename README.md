@@ -28,3 +28,5 @@ Run test and check how much code is already tested.<br>
 
 
 This App was made with React and Redux, the views are styled using Semantic-UI for react components and less style.
+Usuario: javier
+Contraseña: 1234
