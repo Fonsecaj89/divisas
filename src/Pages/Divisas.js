@@ -1,3 +1,4 @@
+/* eslint-disable react/forbid-prop-types */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable global-require */
@@ -7,8 +8,7 @@ import { connect } from 'react-redux';
 import { Container, Grid, Image, Segment, Header, List, Button } from 'semantic-ui-react';
 
 import DivisasForm from '../Components/Divisas/form';
-import { getCachedItem } from '../Utils/cache';
-import { logout } from '../Components/Login/actions';
+import { getCachedItem, cleanCache } from '../Utils/cache';
 import history from '../Utils/history';
 
 class Divisas extends Component {
@@ -32,6 +32,8 @@ class Divisas extends Component {
     }
 
     doLogout() {
+        cleanCache();
+        this.props.limpiar();
         this.props.logout();
         this.checkLogin();
     }
@@ -119,16 +121,20 @@ Divisas.defaultProps = {
 };
 
 Divisas.propTypes = {
-    logout: PropTypes.func.isRequired,
-    history: PropTypes.func,
+    history: PropTypes.object,
 };
 
 const mapStateToProps = state => ({
     login: state.login.login,
 });
 
-
+const mapDispatchToProps = dispatch => {
+    return {
+        logout: () => dispatch({ type: 'LOGOUT' }),
+        limpiar: () => dispatch({ type: 'LIMPIAR' })
+    };
+};
 export default connect(
     mapStateToProps,
-    { logout }
+    mapDispatchToProps
 )(Divisas);

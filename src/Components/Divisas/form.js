@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { Form, Button, Grid, Segment } from 'semantic-ui-react';
 
 import store from '../../store';
-import cambiar from './actions';
+import { cambiar } from './actions';
 
 class DivisasForm extends Component {
     constructor(props) {

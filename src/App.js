@@ -6,16 +6,19 @@ import store from './store';
 
 import 'semantic-ui-less/semantic.less';
 
+import ErrorBoundary from './Utils/ErrorHandler';
 import Login from './Pages/Login';
 import Divisas from './Pages/Divisas';
 
 function App() {
     return (
         <Provider store={store}>
-            <Router>
-                <Route exact path="/" component={Login} />
-                <Route exact path="/divisas" component={Divisas} />
-            </Router>
+            <ErrorBoundary>
+                <Router>
+                    <Route exact path="/" component={Login} />
+                    <Route exact path="/divisas" component={Divisas} />
+                </Router>
+            </ErrorBoundary>
         </Provider>
     );
 }

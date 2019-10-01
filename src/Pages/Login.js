@@ -1,3 +1,4 @@
+/* eslint-disable react/forbid-prop-types */
 /* eslint-disable global-require */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/prop-types */
@@ -8,6 +9,7 @@ import { Grid, Header, Image, Segment } from 'semantic-ui-react';
 
 import LoginForm from '../Components/Login/form';
 import { getCachedItem } from '../Utils/cache';
+import { checkEuroValue } from '../Components/Divisas/actions';
 import history from '../Utils/history';
 
 class Login extends Component {
@@ -20,14 +22,16 @@ class Login extends Component {
 
     componentWillReceiveProps(newProps) {
         if (newProps.loginAuth.authorized) {
+            this.props.checkEuroValue();
             this.props.history.push('/divisas');
         }
     }
-    
+
     checkLogin() {
         if (getCachedItem('userAuthorized') !== null) {
             const { authorized } = getCachedItem('userAuthorized');
             if (authorized) {
+                this.props.checkEuroValue();
                 this.props.history.push('/divisas');
             }
         }
@@ -59,6 +63,7 @@ class Login extends Component {
 
 Login.defaultProps = {
     history,
+    checkEuroValue,
     loginAuth: {
         authorized: false,
     },
@@ -68,7 +73,8 @@ Login.propTypes = {
     loginAuth: PropTypes.shape({
         authorized: PropTypes.bool,
     }),
-    history: PropTypes.func,
+    history: PropTypes.object,
+    checkEuroValue: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
@@ -77,5 +83,5 @@ const mapStateToProps = state => ({
 
 export default connect(
     mapStateToProps,
-    null
+    { checkEuroValue },
 )(Login);

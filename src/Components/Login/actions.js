@@ -1,5 +1,5 @@
 import { LOGIN_SUCCESS, LOGIN_ERROR, LOGOUT } from '../../Redux/types';
-import { addToCache, cleanCache } from '../../Utils/cache'
+import { addToCache } from '../../Utils/cache';
 
 const fakeUsers = {
     username: 'javier',
@@ -24,7 +24,6 @@ export const login = data => dispatch => {
 };
 
 export const logout = () => dispatch => {
-    cleanCache();
     dispatch({
         type: LOGOUT,
     });

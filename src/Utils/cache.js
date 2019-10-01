@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const { localstorage } = window;
+const { localStorage } = window;
 
 export const addToCache = (state, value) => {
     localStorage.setItem(state, JSON.stringify(value));
