@@ -7,13 +7,29 @@ import { connect } from 'react-redux';
 import { Grid, Header, Image, Segment } from 'semantic-ui-react';
 
 import LoginForm from '../Components/Login/form';
-
+import { getCachedItem } from '../Utils/cache';
 import history from '../Utils/history';
 
 class Login extends Component {
+    constructor(props) {
+        super(props);
+
+        this.checkLogin = this.checkLogin.bind(this);
+        this.checkLogin();
+    }
+
     componentWillReceiveProps(newProps) {
         if (newProps.loginAuth.authorized) {
             this.props.history.push('/divisas');
+        }
+    }
+    
+    checkLogin() {
+        if (getCachedItem('userAuthorized') !== null) {
+            const { authorized } = getCachedItem('userAuthorized');
+            if (authorized) {
+                this.props.history.push('/divisas');
+            }
         }
     }
 

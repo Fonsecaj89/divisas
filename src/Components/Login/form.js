@@ -57,7 +57,7 @@ class LoginForm extends Component {
 
     errorMessage = () => {
         const { error } = this.props;
-        
+
         if (error.hasOwnProperty('error')) {
             this.cleanError();
             return (

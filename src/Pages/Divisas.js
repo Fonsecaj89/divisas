@@ -7,7 +7,8 @@ import { connect } from 'react-redux';
 import { Container, Grid, Image, Segment, Header, List, Button } from 'semantic-ui-react';
 
 import DivisasForm from '../Components/Divisas/form';
-
+import { getCachedItem } from '../Utils/cache';
+import { logout } from '../Components/Login/actions';
 import history from '../Utils/history';
 
 class Divisas extends Component {
@@ -15,20 +16,24 @@ class Divisas extends Component {
         super(props);
 
         this.checkLogin = this.checkLogin.bind(this);
-
+        this.doLogout = this.doLogout.bind(this);
         this.checkLogin();
     }
 
-    componentWillReceiveProps(newProps) {
-        if (newProps.login.authorized === false) {
+    checkLogin() {
+        if (getCachedItem('userAuthorized') !== null) {
+            const { authorized } = getCachedItem('userAuthorized');
+            if (authorized) {
+                this.props.history.push('/divisas');
+            }
+        } else {
             this.props.history.push('/');
         }
     }
 
-    checkLogin() {
-        if (this.props.login.authorized === false) {
-            this.props.history.push('/');
-        }
+    doLogout() {
+        this.props.logout();
+        this.checkLogin();
     }
 
     render() {
@@ -56,7 +61,7 @@ class Divisas extends Component {
                             <Button>JPY</Button>
                         </Grid.Column>
                         <Grid.Column>
-                            <Button onClick={this.props.logout} negative>
+                            <Button onClick={this.doLogout} negative>
                                 Logout
                             </Button>
                         </Grid.Column>
@@ -111,15 +116,9 @@ class Divisas extends Component {
 
 Divisas.defaultProps = {
     history,
-    login: {
-        authorized: false,
-    },
 };
 
 Divisas.propTypes = {
-    login: PropTypes.shape({
-        authorized: PropTypes.bool,
-    }),
     logout: PropTypes.func.isRequired,
     history: PropTypes.func,
 };
@@ -128,14 +127,8 @@ const mapStateToProps = state => ({
     login: state.login.login,
 });
 
-const mapDispatchToProps = dispatch => {
-    return {
-        // dispatching plain actions
-        logout: () => dispatch({ type: 'LOGOUT' }),
-    };
-};
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    { logout }
 )(Divisas);

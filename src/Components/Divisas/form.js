@@ -99,7 +99,9 @@ class DivisasForm extends Component {
                     </Form.Group>
                     <Grid>
                         <Grid.Column textAlign="center">
-                            <Button onClick={this.onSubmit} secondary>Calcular</Button>
+                            <Button onClick={this.onSubmit} secondary>
+                                Calcular
+                            </Button>
                             <Button onClick={this.limpiar}>Limpiar</Button>
                         </Grid.Column>
                     </Grid>
