@@ -1,4 +1,4 @@
-import { LOGIN, LOGIN_SUCCESS, LOGIN_ERROR, LOGOUT } from '../actions/types';
+import { LOGIN, LOGIN_SUCCESS, LOGIN_ERROR, LOGOUT, CLEAN_LOGIN_ERROR } from '../../Redux/types';
 
 const initialState = {
     login: { authorized: false },
@@ -26,6 +26,11 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 login: initialState.login,
+            };
+        case CLEAN_LOGIN_ERROR:
+            return {
+                ...state,
+                error: initialState.error,
             };
         default:
             return state;

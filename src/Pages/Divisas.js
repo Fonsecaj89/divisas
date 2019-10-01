@@ -1,13 +1,21 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable global-require */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Container, Grid, Image, Segment, Header, List, Button } from 'semantic-ui-react';
 
-import DivisasForm from '../Components/DivisasForm';
+import DivisasForm from '../Components/Divisas/form';
+
+import history from '../Utils/history';
 
 class Divisas extends Component {
     constructor(props) {
         super(props);
+
+        this.checkLogin = this.checkLogin.bind(this);
+
         this.checkLogin();
     }
 
@@ -101,9 +109,19 @@ class Divisas extends Component {
     }
 }
 
+Divisas.defaultProps = {
+    history,
+    login: {
+        authorized: false,
+    },
+};
+
 Divisas.propTypes = {
-    login: PropTypes.object,
+    login: PropTypes.shape({
+        authorized: PropTypes.bool,
+    }),
     logout: PropTypes.func.isRequired,
+    history: PropTypes.func,
 };
 
 const mapStateToProps = state => ({

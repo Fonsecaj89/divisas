@@ -6,7 +6,7 @@ import Adapter from 'enzyme-adapter-react-16';
 import configureMockStore from 'redux-mock-store';
 import { configure, mount } from 'enzyme';
 
-import DivisasForm from './Components/DivisasForm';
+import DivisasForm from './Components/Divisas/form';
 
 configure({ adapter: new Adapter() });
 const mockStore = configureMockStore();

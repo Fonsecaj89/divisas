@@ -1,4 +1,5 @@
-import { CAMBIAR } from './types';
+/* eslint-disable no-undef */
+import { CAMBIAR } from '../../Redux/types';
 
 const cambiar = data => dispatch => {
     /* 

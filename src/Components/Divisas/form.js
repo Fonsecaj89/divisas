@@ -1,32 +1,42 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable class-methods-use-this */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Form, Button, Grid, Segment } from 'semantic-ui-react';
 
-import cambiar from '../actions/cambioActions';
+import store from '../../store';
+import cambiar from './actions';
 
 class DivisasForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            USD: '0.00',
+            USD: '',
         };
+
+        this.toUSD = this.toUSD.bind(this);
+        this.toEUR = this.toEUR.bind(this);
+        this.limpiar = this.limpiar.bind(this);
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
 
     onChange = event => {
-        this.setState({ [event.target.name]: event.target.value });
+        if (event.target.value.match('(^$)|([0-9])') !== null) {
+            this.setState({ [event.target.name]: event.target.value });
+        }
     };
 
     onSubmit = event => {
         event.preventDefault();
+        const { USD } = this.state;
+
         const valor = {
-            usd: parseFloat(this.state.USD),
+            usd: parseFloat(USD),
         };
         this.toEUR(this.props.cambiar(valor));
-        const usd = this.toUSD(this.state.USD);
+        const usd = this.toUSD(USD);
         this.setState({ USD: usd });
     };
 
@@ -39,6 +49,10 @@ class DivisasForm extends Component {
     }
 
     toEUR(number) {
+        if (number === 0) {
+            return '0.00 €';
+        }
+
         const formatter = new Intl.NumberFormat('de-DE', {
             style: 'currency',
             currency: 'EUR',
@@ -47,10 +61,17 @@ class DivisasForm extends Component {
         return formatter.format(number);
     }
 
+    limpiar() {
+        this.setState({ USD: '' });
+        store.dispatch({ type: 'LIMPIAR' });
+    }
+
     render() {
+        const { USD } = this.state;
+        const { cambio } = this.props;
         return (
             <Segment size="huge">
-                <Form size="big" onSubmit={this.onSubmit}>
+                <Form size="big">
                     <Form.Group widths="equal">
                         <Form.Field>
                             <Form.Input
@@ -58,7 +79,7 @@ class DivisasForm extends Component {
                                 label="Dólares"
                                 type="decimal"
                                 name="USD"
-                                value={this.state.USD}
+                                value={USD}
                                 onChange={this.onChange}
                                 placeholder="0.00"
                             />
@@ -70,7 +91,7 @@ class DivisasForm extends Component {
                                 label="Euro"
                                 type="decimal"
                                 name="EUR"
-                                value={this.toEUR(this.props.cambio)}
+                                value={this.toEUR(cambio)}
                                 placeholder="0.00"
                                 readOnly
                             />
@@ -78,7 +99,8 @@ class DivisasForm extends Component {
                     </Form.Group>
                     <Grid>
                         <Grid.Column textAlign="center">
-                            <Button secondary>Enviar</Button>
+                            <Button onClick={this.onSubmit} secondary>Calcular</Button>
+                            <Button onClick={this.limpiar}>Limpiar</Button>
                         </Grid.Column>
                     </Grid>
                 </Form>
@@ -86,6 +108,11 @@ class DivisasForm extends Component {
         );
     }
 }
+
+DivisasForm.defaultProps = {
+    cambiar: () => {},
+    cambio: '0.00 €',
+};
 
 DivisasForm.propTypes = {
     cambiar: PropTypes.func,
@@ -95,6 +122,7 @@ DivisasForm.propTypes = {
 const mapStateToProps = state => ({
     cambio: state.cambio.cambio,
 });
+
 export default connect(
     mapStateToProps,
     { cambiar }

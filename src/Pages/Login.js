@@ -1,13 +1,17 @@
+/* eslint-disable global-require */
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Grid, Header, Image, Segment } from 'semantic-ui-react';
 
-import LoginForm from '../Components/LoginForm';
+import LoginForm from '../Components/Login/form';
+
+import history from '../Utils/history';
 
 class Login extends Component {
     componentWillReceiveProps(newProps) {
-        console.log('newProps', newProps);
         if (newProps.loginAuth.authorized) {
             this.props.history.push('/divisas');
         }
@@ -37,13 +41,24 @@ class Login extends Component {
     }
 }
 
-LoginForm.propTypes = {
-    loginAuth: PropTypes.object,
+Login.defaultProps = {
+    history,
+    loginAuth: {
+        authorized: false,
+    },
+};
+
+Login.propTypes = {
+    loginAuth: PropTypes.shape({
+        authorized: PropTypes.bool,
+    }),
+    history: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
     loginAuth: state.login.login,
 });
+
 export default connect(
     mapStateToProps,
     null

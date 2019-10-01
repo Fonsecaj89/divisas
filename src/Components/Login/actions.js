@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGIN_ERROR, LOGOUT } from './types';
+import { LOGIN_SUCCESS, LOGIN_ERROR, LOGOUT } from '../../Redux/types';
 
 const fakeUsers = {
     username: 'javier',
